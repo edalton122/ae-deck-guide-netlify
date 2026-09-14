@@ -982,30 +982,41 @@ function buildPrompt() {
   • Visit ${website} before writing a single line of code
   • Extract the actual primary hex color from their site (logo, header, buttons, or dominant brand color) — store as --brand-primary
   • Extract a secondary/accent color (hover states, highlights) — store as --brand-secondary
-  • Download or hotlink the company logo from ${website} and use it prominently on every page
+  • Hotlink the company logo directly from ${website} and use it on every page header and the sticky nav bar
   • The dominant color in the entire deck must be ${name}'s brand color — NOT Salesforce blue (#0176D3)
   • Salesforce blue may only appear as a subtle accent (e.g. one badge or small icon), never as a background, header, or primary button color
-  • Every page must look like it was designed for ${name}, not a generic Salesforce slide deck
+  • Every page must look like it was designed specifically for ${name}, not a generic Salesforce template
 
-NAVIGATION / LAYOUT:
+STICKY TOP NAVIGATION BAR (required on index.html — build this exactly):
+  • Fixed bar, ~52px tall, dark semi-transparent background (e.g. rgba(15,25,45,0.92)) with backdrop-filter:blur(14px)
+  • Left zone: ${name}'s logo (hotlinked, ~26px tall) + a 1px vertical divider + Salesforce logo (https://wp.sfdcdigital.com/en-us/wp-content/uploads/sites/4/2024/11/logo-salesforce.svg, ~22px tall)
+  • Center zone: one button per section, short labels (e.g. "Overview", "Pain Points", "Platform", "Value Calc", "Next Steps"). Clicking smooth-scrolls to that section's id
+  • Right zone: "Schedule Review →" button in brand accent color — opens team.html in a new tab (window.open('team.html','_blank'))
+  • Scroll-spy: on every scroll event, detect which section is centered in viewport and add an "active" class to that nav button (brand color background, white text)
+  • "Value Calc" nav button MUST stand out visually — give it a glowing pulsing border/shadow animation in brand accent color and a ⚡ prefix icon so viewers are drawn to click it
+  • Reading progress bar: 3px horizontal line fixed directly below the nav bar, fills left-to-right as the user scrolls (0%→100%)
+  • Sidebar dot nav: fixed to the right edge of the screen, vertically centered — one dot per section, active dot = brand color (scaled 1.5×), visited dot = muted blue, unvisited = white/30% opacity. Hover shows a label tooltip
+  • IMPORTANT: name your scroll helper function navTo(id) — do NOT override window.scrollTo
+
+SCROLLABLE LAYOUT:
   • All three pages use a scrollable single-page layout — no click-through slide carousels, no "Next slide" buttons
-  • Users scroll down to advance through content; anchor links in the nav jump to sections within the same page
-  • Each section is a full-width content block with generous padding, never hidden behind a slide controller
+  • Users scroll down to advance through content; sections are full-width content blocks with generous vertical padding
+  • Sections fade/slide in using IntersectionObserver (add class "visible" when 10% in viewport) with a .reveal CSS class
 
 CROSS-FILE LINKS (CRITICAL — must use relative paths):
-  • In index.html: link to team page as href="team.html" and exec summary as href="exec-summary.html" — no absolute URLs, no hash-only links
+  • In index.html: link to team page as href="team.html" and exec summary as href="exec-summary.html"
   • In team.html: link back to main deck as href="index.html"
   • In exec-summary.html: link back to main deck as href="index.html"
-  • Test mentally: if all three files are in the same folder, every link must resolve
+  • All CTA buttons and "Back" links must use relative paths — no absolute URLs, no hash-only links
 
 NO THIRD-PARTY WIDGETS:
   • Do not include any chat widgets, live chat scripts, Netlify scripts, tracking pixels, or analytics tags
   • Only these CDN scripts are permitted: Tailwind CSS, Chart.js, Google Fonts — nothing else
 
 TECHNICAL:
-  • Single-file output per page — CDN only (Tailwind, Chart.js, Google Fonts — no external CSS files)
-  • Fully mobile-responsive
-  • All interactive components working: flip cards, detail drawers, accordion, chart tabs, flow diagram
+  • Single-file output per page — CDN only (Tailwind, Chart.js, Google Fonts)
+  • Fully mobile-responsive (on mobile: hide topnav section links and sidebar, show only logo + CTA)
+  • All interactive components working: flip cards, detail drawers, accordion, chart tabs, flow diagram, BVC sliders
 
 OUTPUT FORMAT:
   • Output index.html as one complete unbroken code block
@@ -1060,10 +1071,10 @@ WHAT TO BUILD
 
 Generate THREE complete, self-contained HTML files:
 
-FILE 1: index.html — scrollable single-page executive deck (9 sections, users scroll through them)
+FILE 1: index.html — scrollable single-page executive deck (10 sections, users scroll through them)
   • Full-page scrolling layout — NO slide-by-slide navigation, NO keyboard arrows, NO progress dots
-  • Sticky header with ${name} logo + Salesforce logo + anchor nav links to each section
-  • IntersectionObserver scroll-reveal animations as each section enters view
+  • Sticky top navigation bar + reading progress bar + sidebar dot nav (see STICKY TOP NAVIGATION BAR spec in quality section)
+  • IntersectionObserver scroll-reveal animations (.reveal class) as each section enters view
   • Section 1 — Hero: ${name} logo + Salesforce logo side by side (using ${name}'s brand color as background), key stats animated in, relevant product pills
   • Section 2 — Pain Points: 4 flip cards (front: their exact words from the notes, back: Salesforce solution). Click/tap to flip.
   • Section 3 — Platform: one card per relevant product extracted from transcript, click to open right-side detail drawer
@@ -1071,11 +1082,51 @@ FILE 1: index.html — scrollable single-page executive deck (9 sections, users 
   • Section 5 — Before/After: integration story naming the specific tools from their stack
   • Section 6 — AI Architecture: clickable accordion — Data Layer → Data Cloud → Trust Layer → Agentforce → Apps
   • Section 7 — Executive Dashboard: 3 tabs — renewal risk table, pipeline bar chart (Chart.js), win/loss doughnut
-  • Section 8 — Growth Roadmap: PE/investor angle if mentioned in notes, otherwise platform growth roadmap
-  • Section 9 — Next Steps: 90-day roadmap + two CTA buttons linking to team.html and exec-summary.html (relative paths)
+  • Section 8 — Business Value Calculator (see full spec below — build this exactly)
+  • Section 9 — Growth Roadmap: PE/investor angle if mentioned in notes, otherwise platform growth roadmap
+  • Section 10 — Next Steps: 90-day roadmap + two CTA buttons linking to team.html and exec-summary.html (relative paths)
 
 FILE 2: team.html — account team page with contact cards, initials avatars, mailto links, back link
 FILE 3: exec-summary.html — print-ready one-pager: Print/Save PDF button, 4 pillars, 30/60/90 timeline, team CTA
+
+════════════════════════════════════════
+BUSINESS VALUE CALCULATOR — FULL SPEC
+════════════════════════════════════════
+
+Build this as Section 8 of index.html. It must be fully functional vanilla JavaScript — no frameworks.
+
+HEADER:
+  • Two-column header row: left side has a small pill badge + h2 "Your Business Value with Salesforce" + one-line subtitle, right side has a co-branded lockup panel (${name} logo × Salesforce logo on a light #EFF8FF rounded panel with a subtle border)
+
+TAB NAVIGATION STRIP:
+  • A pill-style tab strip with 3–5 tabs, sitting above the slider panel
+  • Tab names and content must be tailored to ${name}'s specific industry, pain points, and workflow — do NOT use generic tab names
+  • Derive tab themes from the call notes (e.g. if they have field crews → "Field Operations"; if they have complex data → "Platform ROI"; if they're PE-backed with acquisitions → "M&A & Scale")
+  • Active tab style: brand primary color background, white text
+  • Inactive: gray text, transparent background
+  • Clicking a tab calls setTab(n) which shows/hides the matching panel
+
+EACH TAB PANEL contains:
+  • A 2-column grid of 2–4 labeled range sliders
+  • Each slider has a label on the left and a live-updating value badge on the right
+  • Slider default values must be realistic and grounded in the stats/scale from the call notes (headcount, revenue, transaction volume, etc.)
+  • The slider track fills from left with brand primary color using a CSS --pct variable updated on every input event
+  • Below the sliders: 1–2 output cards showing the calculated dollar value or time saved
+  • Output card formula must be grounded in real industry benchmarks — show the math in a small subtitle (e.g. "15% win-rate lift via automated workflows")
+
+JAVASCRIPT REQUIREMENTS:
+  • tabTotals object: const tabTotals = {1:0, 2:0, ...}; — each tab stores its computed value here
+  • calcTab(n): reads slider values for tab n, updates display labels, runs the formula, writes to tabTotals[n], then calls updateGrandTotal()
+  • setTab(n): shows/hides panels, updates tab button active class, calls calcTab(n)
+  • updateGrandTotal(): sums all tabTotals values → updates grand total bar + PE/portfolio toggle + breakdown pills
+  • navTo(id) scroll helper (do NOT use the name "scrollTo" — that conflicts with window.scrollTo)
+  • DOMContentLoaded: call calcTab() for every tab to initialize all values, then setTab(1)
+  • All sliders call calcTab(n) on every oninput event
+
+GRAND TOTAL BAR (always visible below tabs):
+  • Dark gradient panel (brand dark color), displays "Combined Value Across All Categories" label + large dollar total
+  • Below it: a row of small breakdown pills showing each tab's individual contribution (e.g. "Field Ops: $420K · Platform: $168K · Revenue: $1.2M")
+  • If a PE/investor firm was mentioned in the notes: add a toggle card next to the total — "Scale across all [N] [Firm] portfolio companies" — checking it multiplies the total by the estimated portfolio count
 
 ════════════════════════════════════════
 QUALITY
@@ -1085,6 +1136,7 @@ CONTENT:
   • Every data point, stat, pain point, and product recommendation must come from the notes — no invented filler
   • Use ${name}'s actual words throughout — if they said "our guys in the field are flying blind," use that phrase
   • Never suggest replacing tools they use — frame as integration and amplification
+  • BVC slider defaults and formulas must reflect ${name}'s actual scale — if they mentioned 200 field technicians, default the crew slider to 200, not a generic 50
   • Tone: consultative, executive, specific
 
 ${sharedQuality}
@@ -1138,21 +1190,54 @@ Build a POV deck for ${name} in the ${industry || 'their'} industry. Since we ha
 
 Generate THREE complete, self-contained HTML files:
 
-FILE 1: index.html — scrollable single-page discovery POV deck (8 sections, users scroll through them)
+FILE 1: index.html — scrollable single-page discovery POV deck (9 sections, users scroll through them)
   • Full-page scrolling layout — NO slide-by-slide navigation, NO keyboard arrows, NO progress dots
-  • Sticky header with ${name} logo + Salesforce logo + anchor nav links to each section
-  • IntersectionObserver scroll-reveal animations as each section enters view
+  • Sticky top navigation bar + reading progress bar + sidebar dot nav (see STICKY TOP NAVIGATION BAR spec in quality section)
+  • IntersectionObserver scroll-reveal animations (.reveal class) as each section enters view
   • Section 1 — Hero: ${name} logo + Salesforce logo side by side (using ${name}'s brand color as background), bold industry challenge headline, product pills
   • Section 2 — Industry Landscape: 4 stat cards showing macro challenges companies like ${name} face (use real published research)
   • Section 3 — What We're Seeing: 4 flip cards — common pain pattern in ${industry || 'their industry'} on the front, Salesforce solution on the back. Click/tap to flip.
   • Section 4 — Platform: one card per product, click to open right-side detail drawer
   • Section 5 — Customer Proof: 3 real Salesforce customer success stories from similar companies, with metrics
   • Section 6 — AI + Data: what Agentforce and Data Cloud unlock for companies at their stage
-  • Section 7 — What Fast Looks Like: a 90-day vision (not a commitment)
-  • Section 8 — Let's Talk: 3 discovery questions we'd love to explore + two CTA buttons linking to team.html and exec-summary.html (relative paths)
+  • Section 7 — Business Value Calculator (see full spec below — build this exactly)
+  • Section 8 — What Fast Looks Like: a 90-day vision (not a commitment)
+  • Section 9 — Let's Talk: 3 discovery questions we'd love to explore + two CTA buttons linking to team.html and exec-summary.html (relative paths)
 
 FILE 2: team.html — account team page with contact cards, initials avatars, mailto links, back link
 FILE 3: exec-summary.html — print-ready one-pager: industry challenge framing, 4 value pillars, next step CTA, team contact
+
+════════════════════════════════════════
+BUSINESS VALUE CALCULATOR — FULL SPEC
+════════════════════════════════════════
+
+Build this as Section 7 of index.html. It must be fully functional vanilla JavaScript — no frameworks.
+
+HEADER:
+  • Two-column header row: left side has a small pill badge + h2 "Your Business Value with Salesforce" + one-line subtitle, right side has a co-branded lockup panel (${name} logo × Salesforce logo on a light #EFF8FF rounded panel)
+
+TAB NAVIGATION STRIP:
+  • A pill-style tab strip with 3–4 tabs, sitting above the slider panel
+  • Tab names and content must be tailored to the ${industry || 'their'} industry — use the most compelling value levers for that vertical
+  • For example: field service companies → tabs like "Field Operations", "Revenue Growth", "Platform ROI"; SaaS → "Sales Velocity", "Retention & Renewal", "Platform Efficiency"; manufacturing → "Inventory & Supply Chain", "Customer Revenue", "IT Consolidation"
+  • Active tab: brand primary color background, white text. Inactive: gray text, transparent.
+  • Clicking a tab calls setTab(n)
+
+EACH TAB PANEL contains:
+  • A 2-column grid of 2–4 labeled range sliders with live value badges
+  • Slider defaults: use industry-standard benchmark figures (e.g. for field service: avg truck roll ~$150–300; for SaaS: avg ARR per customer ~$25K–$80K)
+  • Slider track fills with brand color using CSS --pct variable
+  • 1–2 output cards per tab with calculated value and a brief benchmark citation
+
+JAVASCRIPT REQUIREMENTS:
+  • const tabTotals = {1:0, 2:0, ...}
+  • calcTab(n), setTab(n), updateGrandTotal() — same pattern as notes-mode spec above
+  • navTo(id) for smooth scrolling (never use "scrollTo" as a function name)
+  • DOMContentLoaded: initialize all tabs then setTab(1)
+
+GRAND TOTAL BAR:
+  • Dark gradient panel with "Combined Annual Value Estimate" label + large dollar total, always visible below the tabs
+  • Breakdown pills below it showing each tab's value
 
 ════════════════════════════════════════
 QUALITY
@@ -1162,6 +1247,7 @@ CONTENT:
   • Tone: peer-to-peer, curious, consultative — never salesy or presumptuous
   • Frame as "what we're seeing in your industry," not "here's what's wrong with your company"
   • Use real Salesforce proof points and published industry statistics throughout
+  • BVC slider defaults must use real published industry benchmarks — cite the source in the output card subtitle
   • End with questions, not answers — create the pull toward a discovery conversation
 
 ${sharedQuality}
