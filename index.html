@@ -1011,7 +1011,8 @@ CROSS-FILE LINKS (CRITICAL — must use relative paths):
 
 NO THIRD-PARTY WIDGETS:
   • Do not include any chat widgets, live chat scripts, Netlify scripts, tracking pixels, or analytics tags
-  • Only these CDN scripts are permitted: Tailwind CSS, Chart.js, Google Fonts — nothing else
+  • Only these CDN scripts are permitted: Tailwind CSS, Chart.js, Google Fonts, jsPDF — nothing else
+  • jsPDF CDN: https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js
 
 TECHNICAL:
   • Single-file output per page — CDN only (Tailwind, Chart.js, Google Fonts)
@@ -1128,6 +1129,18 @@ GRAND TOTAL BAR (always visible below tabs):
   • Below it: a row of small breakdown pills showing each tab's individual contribution (e.g. "Field Ops: $420K · Platform: $168K · Revenue: $1.2M")
   • If a PE/investor firm was mentioned in the notes: add a toggle card next to the total — "Scale across all [N] [Firm] portfolio companies" — checking it multiplies the total by the estimated portfolio count
 
+PDF EXPORT BUTTON (required — build this exactly):
+  • Below the breakdown pills, add an "Export Business Case PDF" button (right-aligned, white background, brand border, download icon)
+  • Clicking it calls generateBvcPDF() which uses jsPDF (already loaded via CDN) to produce a branded A4 PDF containing:
+    1. Header band in brand primary color: company name + "× Salesforce" + "Business Value Assessment" + generation date
+    2. Grand total hero box (light background, large dollar figure, PE portfolio line if toggle is checked)
+    3. Bar chart: one bar per tab using the tabTotals values — render on an offscreen <canvas> via Chart.js with animation:false, then embed via doc.addImage(canvas.toDataURL(), ...)
+    4. Per-tab breakdown: for each tab, a colored header band (tab name + tab total), then each slider label + current value, then each output label + calculated value in a light-tinted row
+    5. Footer band in brand primary color: "Prepared by Salesforce · Confidential · For Discussion Purposes Only"
+  • File saves as "[CompanyName]-Salesforce-Business-Value.pdf"
+  • jsPDF API: const { jsPDF } = window.jspdf; const doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'}); — use doc.setFillColor('#hex'), doc.roundedRect(), doc.text(), doc.addImage()
+  • IMPORTANT: destroy the temporary Chart instance after calling toDataURL() to avoid memory leaks: tmpChart.destroy()
+
 ════════════════════════════════════════
 QUALITY
 ════════════════════════════════════════
@@ -1238,6 +1251,11 @@ JAVASCRIPT REQUIREMENTS:
 GRAND TOTAL BAR:
   • Dark gradient panel with "Combined Annual Value Estimate" label + large dollar total, always visible below the tabs
   • Breakdown pills below it showing each tab's value
+
+PDF EXPORT BUTTON (required — same spec as notes mode above):
+  • "Export Business Case PDF" button below the breakdown pills
+  • generateBvcPDF() builds a branded A4 PDF: header band, grand total box, bar chart (offscreen canvas + Chart.js animation:false + addImage), per-tab breakdowns, footer
+  • File saves as "[CompanyName]-Salesforce-Business-Value.pdf"
 
 ════════════════════════════════════════
 QUALITY
