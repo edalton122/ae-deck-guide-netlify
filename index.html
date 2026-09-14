@@ -988,15 +988,33 @@ function buildPrompt() {
   SE:  ${seName || 'Your SE Name'} | Solutions Engineer | ${seEmail || 'se@salesforce.com'}
   RVP: ${rvpName || 'Your RVP Name'} | Regional Vice President | ${rvpEmail || 'rvp@salesforce.com'}`;
 
-  const sharedQuality = `BRANDING:
-  • Fetch brand colors from ${website} — use their actual palette (CSS variables: --brand-primary, --brand-secondary, --brand-accent, --brand-light)
-  • Pull logo and hero imagery directly from ${website}
-  • Every visual should feel purpose-built for ${name}, not a generic Salesforce template
+  const sharedQuality = `BRANDING (CRITICAL — do this first):
+  • Visit ${website} before writing a single line of code
+  • Extract the actual primary hex color from their site (logo, header, buttons, or dominant brand color) — store as --brand-primary
+  • Extract a secondary/accent color (hover states, highlights) — store as --brand-secondary
+  • Download or hotlink the company logo from ${website} and use it prominently on every page
+  • The dominant color in the entire deck must be ${name}'s brand color — NOT Salesforce blue (#0176D3)
+  • Salesforce blue may only appear as a subtle accent (e.g. one badge or small icon), never as a background, header, or primary button color
+  • Every page must look like it was designed for ${name}, not a generic Salesforce slide deck
+
+NAVIGATION / LAYOUT:
+  • All three pages use a scrollable single-page layout — no click-through slide carousels, no "Next slide" buttons
+  • Users scroll down to advance through content; anchor links in the nav jump to sections within the same page
+  • Each section is a full-width content block with generous padding, never hidden behind a slide controller
+
+CROSS-FILE LINKS (CRITICAL — must use relative paths):
+  • In index.html: link to team page as href="team.html" and exec summary as href="exec-summary.html" — no absolute URLs, no hash-only links
+  • In team.html: link back to main deck as href="index.html"
+  • In exec-summary.html: link back to main deck as href="index.html"
+  • Test mentally: if all three files are in the same folder, every link must resolve
+
+NO THIRD-PARTY WIDGETS:
+  • Do not include any chat widgets, live chat scripts, Netlify scripts, tracking pixels, or analytics tags
+  • Only these CDN scripts are permitted: Tailwind CSS, Chart.js, Google Fonts — nothing else
 
 TECHNICAL:
   • Single-file output per page — CDN only (Tailwind, Chart.js, Google Fonts — no external CSS files)
-  • Fully mobile-responsive; sidebar collapses to hamburger on mobile
-  • Progress bar at top of index.html; keyboard arrow navigation between slides
+  • Fully mobile-responsive
   • All interactive components working: flip cards, detail drawers, accordion, chart tabs, flow diagram
 
 OUTPUT FORMAT:
@@ -1049,16 +1067,19 @@ From the notes, extract:
 
 Generate THREE complete, self-contained HTML files:
 
-FILE 1: index.html — 9-slide interactive account deck
-  • Slide 1: Hero — ${name} logo + Salesforce logo, their key stats animated, product pills
-  • Slide 2: Pain points — 4 flip cards (front: their words, back: Salesforce solution). Click/hover to flip.
-  • Slide 3: Platform — one card per product, click to open right-side detail drawer
-  • Slide 4: Field intelligence flow — interactive 3-step diagram with Advance/Reset buttons
-  • Slide 5: Before/After — integration story naming the specific tools from their stack
-  • Slide 6: AI architecture — clickable accordion: Data Layer → Data Cloud → Trust Layer → Agentforce → Apps
-  • Slide 7: Executive dashboard — 3 tabs: renewal risk table, pipeline bar chart (Chart.js), win/loss doughnut
-  • Slide 8: ${pe ? `PE portfolio value slide for ${pe}` : 'Growth roadmap and platform slide'}
-  • Slide 9: 90-day roadmap + two CTA buttons → team.html and exec-summary.html
+FILE 1: index.html — scrollable single-page executive deck (9 sections, users scroll through them)
+  • Full-page scrolling layout — NO slide-by-slide navigation, NO keyboard arrows, NO progress dots
+  • Sticky header with ${name} logo + Salesforce logo + anchor nav links to each section
+  • IntersectionObserver scroll-reveal animations as each section enters view
+  • Section 1 — Hero: ${name} logo + Salesforce logo side by side (using ${name}'s brand color as background), key stats animated in, product pills
+  • Section 2 — Pain Points: 4 flip cards (front: their words from the notes, back: Salesforce solution). Click/tap to flip.
+  • Section 3 — Platform: one card per product, click to open right-side detail drawer
+  • Section 4 — Field Intelligence Flow: interactive 3-step diagram with Advance/Reset buttons
+  • Section 5 — Before/After: integration story naming the specific tools from their stack
+  • Section 6 — AI Architecture: clickable accordion — Data Layer → Data Cloud → Trust Layer → Agentforce → Apps
+  • Section 7 — Executive Dashboard: 3 tabs — renewal risk table, pipeline bar chart (Chart.js), win/loss doughnut
+  • Section 8: ${pe ? `PE portfolio value section for ${pe}` : 'Growth roadmap and platform section'}
+  • Section 9 — Next Steps: 90-day roadmap + two CTA buttons linking to team.html and exec-summary.html (relative paths)
 
 FILE 2: team.html — account team page with contact cards, initials avatars, mailto links, back link
 FILE 3: exec-summary.html — print-ready one-pager: Print/Save PDF button, 4 pillars, 30/60/90 timeline, team CTA
@@ -1118,15 +1139,18 @@ Build a POV deck for ${name} in the ${industry || 'their'} industry. Since we ha
 
 Generate THREE complete, self-contained HTML files:
 
-FILE 1: index.html — 8-slide discovery POV deck
-  • Slide 1: Hero — ${name} logo + Salesforce logo, bold industry challenge headline, product pills
-  • Slide 2: Industry landscape — 4 stat cards showing macro challenges companies like ${name} face (use real research)
-  • Slide 3: What we're seeing — 4 flip cards: common pain pattern in ${industry || 'their industry'} → how Salesforce addresses it
-  • Slide 4: Platform — one card per product, click to open right-side detail drawer
-  • Slide 5: Customer proof — 3 real Salesforce customer success stories from similar companies, with metrics
-  • Slide 6: AI + Data — what Agentforce and Data Cloud unlock for companies at their stage
-  • Slide 7: What fast looks like — a 90-day picture (not a commitment, just a vision)
-  • Slide 8: Let's talk — 3 discovery questions we'd love to explore + two CTA buttons → team.html and exec-summary.html
+FILE 1: index.html — scrollable single-page discovery POV deck (8 sections, users scroll through them)
+  • Full-page scrolling layout — NO slide-by-slide navigation, NO keyboard arrows, NO progress dots
+  • Sticky header with ${name} logo + Salesforce logo + anchor nav links to each section
+  • IntersectionObserver scroll-reveal animations as each section enters view
+  • Section 1 — Hero: ${name} logo + Salesforce logo side by side (using ${name}'s brand color as background), bold industry challenge headline, product pills
+  • Section 2 — Industry Landscape: 4 stat cards showing macro challenges companies like ${name} face (use real published research)
+  • Section 3 — What We're Seeing: 4 flip cards — common pain pattern in ${industry || 'their industry'} on the front, Salesforce solution on the back. Click/tap to flip.
+  • Section 4 — Platform: one card per product, click to open right-side detail drawer
+  • Section 5 — Customer Proof: 3 real Salesforce customer success stories from similar companies, with metrics
+  • Section 6 — AI + Data: what Agentforce and Data Cloud unlock for companies at their stage
+  • Section 7 — What Fast Looks Like: a 90-day vision (not a commitment)
+  • Section 8 — Let's Talk: 3 discovery questions we'd love to explore + two CTA buttons linking to team.html and exec-summary.html (relative paths)
 
 FILE 2: team.html — account team page with contact cards, initials avatars, mailto links, back link
 FILE 3: exec-summary.html — print-ready one-pager: industry challenge framing, 4 value pillars, next step CTA, team contact
