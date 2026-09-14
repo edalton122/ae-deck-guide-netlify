@@ -692,7 +692,7 @@
 
     <form id="deck-form" onsubmit="return false;">
 
-      <!-- ── SHARED: Name + Website + PE (always visible) ── -->
+      <!-- ── ALWAYS: Name + Website ── -->
       <div class="form-grid" style="margin-bottom:16px;">
         <div class="form-group">
           <label>Customer Company Name *</label>
@@ -702,39 +702,14 @@
           <label>Customer Website *</label>
           <input type="url" id="f-website" placeholder="https://acmewatercorp.com" required/>
         </div>
-        <div class="form-group">
-          <label>PE / Investor Firm <span style="font-weight:400;color:var(--muted);">(optional)</span></label>
-          <input type="text" id="f-pe" placeholder="e.g. Blackstone Growth"/>
-        </div>
-        <div class="form-group">
-          <label>Industry / Vertical *</label>
-          <input type="text" id="f-industry" placeholder="e.g. Water Infrastructure, Industrial Services"/>
-        </div>
       </div>
 
-      <!-- ── SHARED: Products (always visible) ── -->
-      <div class="form-group" style="margin-bottom:16px;">
-        <label>Salesforce Products — Select All Relevant</label>
-        <div class="products-check" id="products-check">
-          <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Sales Cloud"/>Sales Cloud</label>
-          <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Field Service Mobile"/>Field Service Mobile</label>
-          <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Data Cloud"/>Data Cloud</label>
-          <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Agentforce"/>Agentforce</label>
-          <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Tableau"/>Tableau</label>
-          <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Revenue Cloud"/>Revenue Cloud</label>
-          <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Service Cloud"/>Service Cloud</label>
-          <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Slack"/>Slack</label>
-          <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Experience Cloud"/>Experience Cloud</label>
-          <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="HubSpot Integration"/>HubSpot Integration</label>
-        </div>
-      </div>
-
-      <!-- ── MODE A: Have notes ── -->
+      <!-- ── MODE A: Have notes — just the transcript ── -->
       <div id="fields-notes">
         <div class="form-group" style="margin-bottom:16px;">
           <label>Call Transcript, Meeting Notes, or Google Doc URL *</label>
           <textarea id="f-notes" placeholder="Paste a Google Docs or Google Meet Notes URL — Gemini reads it directly from your Workspace. Or paste the raw transcript. Either works." style="min-height:140px;"></textarea>
-          <small>Google Meet notes URL, Google Doc link, or raw transcript — Gemini reads all three since you're already signed into Google Workspace.</small>
+          <small>Gemini will extract industry, PE/investor, tech stack, pain points, and relevant products directly from your notes. No extra fields needed.</small>
         </div>
       </div>
 
@@ -742,12 +717,16 @@
       <div id="fields-discovery" style="display:none;">
         <div class="form-grid" style="margin-bottom:16px;">
           <div class="form-group">
-            <label>Field / Service Team Size <span style="font-weight:400;color:var(--muted);">(estimate)</span></label>
-            <input type="text" id="f-crews" placeholder="e.g. 200+ field technicians, ~50 service crews"/>
+            <label>PE / Investor Firm <span style="font-weight:400;color:var(--muted);">(optional)</span></label>
+            <input type="text" id="f-pe" placeholder="e.g. Blackstone Growth"/>
           </div>
           <div class="form-group">
-            <label>Geographic Footprint</label>
-            <input type="text" id="f-geo" placeholder="e.g. 32 states across the Southeast"/>
+            <label>Industry / Vertical *</label>
+            <input type="text" id="f-industry" placeholder="e.g. Water Infrastructure, Industrial Services"/>
+          </div>
+          <div class="form-group">
+            <label>Field / Service Team Size <span style="font-weight:400;color:var(--muted);">(estimate)</span></label>
+            <input type="text" id="f-crews" placeholder="e.g. 200+ field technicians, ~50 service crews"/>
           </div>
           <div class="form-group">
             <label>Known Tech Stack <span style="font-weight:400;color:var(--muted);">(tools they already use)</span></label>
@@ -761,6 +740,24 @@
           <div class="form-group full">
             <label>What do you already know about them? <span style="font-weight:400;color:var(--muted);">(optional)</span></label>
             <textarea id="f-context" placeholder="LinkedIn research, press releases, anything from their website, a referral note — even a sentence or two helps Gemini personalize the deck." style="min-height:100px;"></textarea>
+          </div>
+        </div>
+
+        <!-- Products: discovery mode only -->
+        <div class="form-group" style="margin-bottom:16px;">
+          <label>Salesforce Products — Select All Relevant</label>
+          <small style="display:block;margin-bottom:8px;">No transcript yet — select the products you think are most relevant based on what you know about them.</small>
+          <div class="products-check" id="products-check">
+            <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Sales Cloud"/>Sales Cloud</label>
+            <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Field Service Mobile"/>Field Service Mobile</label>
+            <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Data Cloud"/>Data Cloud</label>
+            <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Agentforce"/>Agentforce</label>
+            <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Tableau"/>Tableau</label>
+            <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Revenue Cloud"/>Revenue Cloud</label>
+            <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Service Cloud"/>Service Cloud</label>
+            <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Slack"/>Slack</label>
+            <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="Experience Cloud"/>Experience Cloud</label>
+            <label class="product-pill" onclick="togglePill(this)"><input type="checkbox" value="HubSpot Integration"/>HubSpot Integration</label>
           </div>
         </div>
       </div>
@@ -965,8 +962,6 @@ function setMode(mode) {
 function buildPrompt() {
   const name     = document.getElementById('f-name').value.trim();
   const website  = document.getElementById('f-website').value.trim();
-  const pe       = document.getElementById('f-pe').value.trim();
-  const industry = document.getElementById('f-industry').value.trim();
   const aeName   = document.getElementById('f-ae-name').value.trim();
   const aeEmail  = document.getElementById('f-ae-email').value.trim();
   const seName   = document.getElementById('f-se-name').value.trim();
@@ -978,11 +973,6 @@ function buildPrompt() {
     alert('Please fill in the Customer Name and Website.');
     return;
   }
-
-  const products = [...document.querySelectorAll('#products-check input:checked')].map(i => i.value);
-  const productList = products.length > 0
-    ? products.map(p => `  • ${p}`).join('\n')
-    : '  • Sales Cloud\n  • Field Service Mobile\n  • Data Cloud\n  • Agentforce';
 
   const team = `  AE:  ${aeName || 'Your AE Name'} | Account Executive | ${aeEmail || 'ae@salesforce.com'}
   SE:  ${seName || 'Your SE Name'} | Solutions Engineer | ${seEmail || 'se@salesforce.com'}
@@ -1042,10 +1032,6 @@ CUSTOMER
 
 Company: ${name}
 Website: ${website}
-Industry: ${industry || 'See notes'}${pe ? `\nPE / Investor Firm: ${pe}` : ''}
-
-Salesforce Products:
-${productList}
 
 Account Team:
 ${team}
@@ -1057,13 +1043,20 @@ CALL NOTES / TRANSCRIPT
 ${notes}
 
 ════════════════════════════════════════
-WHAT TO BUILD
+WHAT TO EXTRACT FROM THE NOTES
 ════════════════════════════════════════
 
-From the notes, extract:
-  • Exactly 4 pain points — use the customer's own words, not generic language
-  • Key stats they mentioned (revenue, team size, geography, growth targets)
-  • Their current tech stack — name every tool, especially ones they like (we integrate, never replace)
+Read the transcript carefully and extract all of the following before writing any code:
+  • Industry / vertical — infer from what they do and how they describe themselves
+  • PE or investor firm — look for any mention of private equity, investment firm, or ownership structure
+  • Exactly 4 pain points — use the customer's own words verbatim, not paraphrased
+  • Key stats they mentioned (revenue, headcount, team size, geography, growth targets)
+  • Their current tech stack — name every tool mentioned, especially ones they value (Salesforce integrates, never replaces)
+  • Salesforce products most relevant to their situation — infer from their pain points, industry, and workflow; do not default to Sales Cloud alone
+
+════════════════════════════════════════
+WHAT TO BUILD
+════════════════════════════════════════
 
 Generate THREE complete, self-contained HTML files:
 
@@ -1071,14 +1064,14 @@ FILE 1: index.html — scrollable single-page executive deck (9 sections, users 
   • Full-page scrolling layout — NO slide-by-slide navigation, NO keyboard arrows, NO progress dots
   • Sticky header with ${name} logo + Salesforce logo + anchor nav links to each section
   • IntersectionObserver scroll-reveal animations as each section enters view
-  • Section 1 — Hero: ${name} logo + Salesforce logo side by side (using ${name}'s brand color as background), key stats animated in, product pills
-  • Section 2 — Pain Points: 4 flip cards (front: their words from the notes, back: Salesforce solution). Click/tap to flip.
-  • Section 3 — Platform: one card per product, click to open right-side detail drawer
+  • Section 1 — Hero: ${name} logo + Salesforce logo side by side (using ${name}'s brand color as background), key stats animated in, relevant product pills
+  • Section 2 — Pain Points: 4 flip cards (front: their exact words from the notes, back: Salesforce solution). Click/tap to flip.
+  • Section 3 — Platform: one card per relevant product extracted from transcript, click to open right-side detail drawer
   • Section 4 — Field Intelligence Flow: interactive 3-step diagram with Advance/Reset buttons
   • Section 5 — Before/After: integration story naming the specific tools from their stack
   • Section 6 — AI Architecture: clickable accordion — Data Layer → Data Cloud → Trust Layer → Agentforce → Apps
   • Section 7 — Executive Dashboard: 3 tabs — renewal risk table, pipeline bar chart (Chart.js), win/loss doughnut
-  • Section 8: ${pe ? `PE portfolio value section for ${pe}` : 'Growth roadmap and platform section'}
+  • Section 8 — Growth Roadmap: PE/investor angle if mentioned in notes, otherwise platform growth roadmap
   • Section 9 — Next Steps: 90-day roadmap + two CTA buttons linking to team.html and exec-summary.html (relative paths)
 
 FILE 2: team.html — account team page with contact cards, initials avatars, mailto links, back link
@@ -1089,9 +1082,9 @@ QUALITY
 ════════════════════════════════════════
 
 CONTENT:
-  • Use ${name}'s actual words from the notes throughout
+  • Every data point, stat, pain point, and product recommendation must come from the notes — no invented filler
+  • Use ${name}'s actual words throughout — if they said "our guys in the field are flying blind," use that phrase
   • Never suggest replacing tools they use — frame as integration and amplification
-  • All stats must come from the notes, not invented filler
   • Tone: consultative, executive, specific
 
 ${sharedQuality}
@@ -1100,11 +1093,17 @@ Start generating now. Output index.html first.`;
 
   } else {
     // ── Discovery / POV deck (no notes) ──
-    const crews   = document.getElementById('f-crews').value.trim();
-    const geo     = document.getElementById('f-geo').value.trim();
-    const tech    = document.getElementById('f-tech').value.trim();
-    const date    = document.getElementById('f-date').value.trim() || 'Q4 2026';
-    const context = document.getElementById('f-context').value.trim();
+    const pe       = document.getElementById('f-pe').value.trim();
+    const industry = document.getElementById('f-industry').value.trim();
+    const crews    = document.getElementById('f-crews').value.trim();
+    const geo      = document.getElementById('f-geo').value.trim();
+    const tech     = document.getElementById('f-tech').value.trim();
+    const date     = document.getElementById('f-date').value.trim() || 'Q4 2026';
+    const context  = document.getElementById('f-context').value.trim();
+    const products = [...document.querySelectorAll('#products-check input:checked')].map(i => i.value);
+    const productList = products.length > 0
+      ? products.map(p => `  • ${p}`).join('\n')
+      : '  • Sales Cloud\n  • Field Service Mobile\n  • Data Cloud\n  • Agentforce';
 
     prompt = `You are a senior Salesforce solutions architect and executive communication specialist. Generate a fully branded, interactive HTML point-of-view (POV) deck for a prospect we have not yet met with.
 
