@@ -1014,6 +1014,22 @@ NO THIRD-PARTY WIDGETS:
   • Only these CDN scripts are permitted: Tailwind CSS, Chart.js, Google Fonts, jsPDF — nothing else
   • jsPDF CDN: https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js
 
+LISTEN / AUDIO PLAYBACK BUTTON (required — add to Hero section of index.html):
+  • Place a Washington Post-style "Listen (X min)" pill button between the hero subtitle paragraph and the product pills
+  • Styling: glass pill — rgba(255,255,255,0.10) background, 1px rgba(255,255,255,0.28) border, backdrop-filter:blur, white Inter 600 text, border-radius:99px, padding 9px 20px
+  • The button has three child spans: a play/wave icon span, a label span ("Listen"), and a duration badge span ("(X min)")
+  • On play: icon changes from ▶ to 4 animated CSS bars (@keyframes audioWave pulsing up/down); label changes to "Pause"; button gets an is-playing class adding brand-color glow
+  • Below the button: a thin 3px progress track (220px wide, rgba white/15%) with a brand-color fill that advances as audio plays
+  • Duration badge: calculate as Math.round(wordCount / 140) + " min" — set on page load
+  • Implementation uses window.speechSynthesis — no external CDN, no file upload needed:
+    - LISTEN_SCRIPT constant: write a 280–340 word narration covering (1) who ${name} is and their current business moment, (2) the 2–3 core challenges they face in their industry, (3) what Salesforce unlocks for companies like them, (4) a brief signpost of what this deck covers section by section, (5) CTA to explore the Business Value Calculator and reach out to the team
+    - initListen(): called on load; picks best voice via getVoices() in order: "Google US English" → "Microsoft David - English (United States)" → "Samantha" → "Alex" → first en-US voice; handles Chrome async voiceschanged event; sets duration badge
+    - toggleListen(): idle→speak(); playing→pause(); paused→resume(); updates icon, label, and button class each time
+    - Utterance boundary event updates progress fill: charIndex / LISTEN_SCRIPT.length × 100%
+    - On utterance end: reset button to idle state, briefly show 100% fill then fade to 0%
+    - Auto-stop if user scrolls the hero slide entirely above the viewport (check slide-1 getBoundingClientRect().bottom < -100)
+    - If speechSynthesis not supported: hide the listen bar entirely (display:none)
+
 TECHNICAL:
   • Single-file output per page — CDN only (Tailwind, Chart.js, Google Fonts)
   • Fully mobile-responsive (on mobile: hide topnav section links and sidebar, show only logo + CTA)
